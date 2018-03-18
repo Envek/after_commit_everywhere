@@ -1,0 +1,25 @@
+cache: bundler
+sudo: false
+language: ruby
+
+addons:
+  apt:
+    sources:
+      - travis-ci/sqlite3
+    packages:
+      - sqlite3
+
+matrix:
+  include:
+    - rvm: 2.5.0
+      gemfile: gemfiles/activerecord_5_0.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/activerecord_5_1.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/activerecord_5_2.gemfile
+    - rvm: 2.5.0
+      gemfile: gemfiles/activerecord_master.gemfile
+    - rvm: 2.4.3
+      gemfile: gemfiles/activerecord_5_2.gemfile
+    - rvm: 2.3.6
+      gemfile: gemfiles/activerecord_5_2.gemfile
