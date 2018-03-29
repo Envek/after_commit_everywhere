@@ -39,6 +39,10 @@ RSpec.describe AfterCommitEverywhere do
         subject
         expect(handler).to have_received(:call)
       end
+
+      it "doesn't print any warnings as it is expected behaviour" do
+        expect { subject }.not_to output.to_stderr
+      end
     end
 
     context 'with nested transactions' do
@@ -137,6 +141,10 @@ RSpec.describe AfterCommitEverywhere do
       it 'executes code immediately' do
         subject
         expect(handler).to have_received(:call)
+      end
+
+      it 'warns as it is unclear whether it is expected behaviour or not' do
+        expect { subject }.to output(anything).to_stderr
       end
     end
 

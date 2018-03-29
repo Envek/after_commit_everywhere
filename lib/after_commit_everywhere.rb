@@ -25,7 +25,7 @@ module AfterCommitEverywhere
       connection: connection,
       name: __callee__,
       callback: callback,
-      no_tx_action: :warn,
+      no_tx_action: :execute,
     )
   end
 
@@ -41,7 +41,7 @@ module AfterCommitEverywhere
       connection: connection,
       name: __callee__,
       callback: callback,
-      no_tx_action: :warn,
+      no_tx_action: :warn_and_execute,
     )
   end
 
@@ -69,8 +69,10 @@ module AfterCommitEverywhere
       raise ArgumentError, "Provide callback to #{name}" unless callback
       unless in_transaction?(connection)
         case no_tx_action
-        when :warn
+        when :warn_and_execute
           warn "#{name}: No transaction open. Executing callback immediately."
+          return callback.call
+        when :execute
           return callback.call
         when :exception
           raise NotInTransaction, "#{name} is useless outside transaction"
