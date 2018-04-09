@@ -110,7 +110,7 @@ Please keep in mind ActiveRecord's [limitations for rolling back nested transact
 
 #### Does it works with transactional_test or DatabaseCleaner
 
-*Yes* but currently it is not tested (help wanted).
+**Yes**.
 
 
 ## Development

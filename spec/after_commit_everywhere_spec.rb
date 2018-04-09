@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+RSpec.configure do |config|
+  next unless config.respond_to?(:use_transactional_fixtures=)
+  config.use_transactional_fixtures = false
+end
+
 RSpec.describe AfterCommitEverywhere do
   it 'has a version number' do
     expect(AfterCommitEverywhere::VERSION).not_to be nil
