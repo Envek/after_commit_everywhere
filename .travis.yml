@@ -11,15 +11,15 @@ addons:
 
 matrix:
   include:
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       gemfile: gemfiles/activerecord_5_0.gemfile
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       gemfile: gemfiles/activerecord_5_1.gemfile
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       gemfile: gemfiles/activerecord_5_2.gemfile
-    - rvm: 2.5.0
+    - rvm: 2.5.1
       gemfile: gemfiles/activerecord_master.gemfile
-    - rvm: 2.4.3
+    - rvm: 2.4.4
       gemfile: gemfiles/activerecord_5_2.gemfile
-    - rvm: 2.3.6
+    - rvm: 2.3.7
       gemfile: gemfiles/activerecord_5_2.gemfile
