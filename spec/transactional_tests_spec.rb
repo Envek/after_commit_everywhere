@@ -12,7 +12,6 @@ end
 TestApp.initialize!
 
 require "rspec/rails"
-require "webmock/rspec"
 require "isolator"
 
 RSpec.configure do |config|
@@ -31,11 +30,9 @@ RSpec.describe "use_transactional_tests=true" do
     Isolator.disable!
   end
 
-  before do
-    stub_request(:get, "http://example.com/").to_return(body: "Badaboom")
+  subject do
+    raise Isolator::UnsafeOperationError if Isolator.within_transaction?
   end
-
-  subject { Net::HTTP.get(URI("http://example.com/")) }
 
   it "doesn't raise when no transaction" do
     expect { subject }.not_to raise_error
