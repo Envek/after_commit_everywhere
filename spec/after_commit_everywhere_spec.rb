@@ -122,6 +122,16 @@ RSpec.describe AfterCommitEverywhere do
       end
     end
 
+    if ActiveRecord::VERSION::MAJOR < 5
+      it 'fails because it is unsupported in Rails 4' do
+        expect { subject }.to raise_error(NotImplementedError) do |ex|
+          expect(ex.message).to match(/Rails 5\.0\+/)
+        end
+      end
+
+      next
+    end
+
     context 'within transaction' do
       it 'executes code only before commit' do
         ActiveRecord::Base.transaction do

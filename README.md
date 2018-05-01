@@ -98,6 +98,8 @@ Will be executed right before outermost transaction will be commited _(I can't i
 
 If called outside transaction will execute callback immediately.
 
+Supported only starting from ActiveRecord 5.0.
+
 #### `after_rollback`
 
 Will be executed right after transaction in which it have been declared was rolled back (this might be nested savepoint transaction block with `requires_new: true`).
