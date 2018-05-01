@@ -12,6 +12,8 @@ addons:
 matrix:
   include:
     - rvm: 2.5.1
+      gemfile: gemfiles/activerecord_4_2.gemfile
+    - rvm: 2.5.1
       gemfile: gemfiles/activerecord_5_0.gemfile
     - rvm: 2.5.1
       gemfile: gemfiles/activerecord_5_1.gemfile

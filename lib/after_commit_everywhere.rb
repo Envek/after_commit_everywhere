@@ -33,10 +33,15 @@ module AfterCommitEverywhere
   #
   # If called outside transaction it will execute callback immediately.
   #
+  # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
+  #
   # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
   # @param callback   [#call] Callback to be executed
   # @return           void
   def before_commit(connection: ActiveRecord::Base.connection, &callback)
+    if ActiveRecord::VERSION::MAJOR < 5
+      raise NotImplementedError, "#{__callee__} works only with Rails 5.0+"
+    end
     AfterCommitEverywhere.register_callback(
       connection: connection,
       name: __callee__,
