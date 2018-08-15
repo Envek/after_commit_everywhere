@@ -10,11 +10,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Andrey Novikov']
   spec.email         = ['envek@envek.name']
 
-  spec.summary       = <<~MSG.strip
+  spec.summary       = <<-MSG.strip
     Executes code after database commit wherever you want in your application
   MSG
 
-  spec.description = <<~MSG.strip
+  spec.description = <<-MSG.strip
     Brings before_commit, after_commit, and after_rollback transactional \
     callbacks outside of your ActiveRecord models.
   MSG
@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord', '>= 4.2'
+  spec.add_dependency 'activerecord', '>= 3.2'
   spec.add_development_dependency 'appraisal'
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'pry'
