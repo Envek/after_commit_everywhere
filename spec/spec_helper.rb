@@ -3,15 +3,16 @@
 require 'bundler/setup'
 require 'after_commit_everywhere'
 require 'pry'
+require 'logger'
 
 log = Logger.new('tmp/db.log')
 log.sev_threshold = Logger::DEBUG
 ActiveRecord::Base.logger = log
-ActiveRecord::Base.establish_connection('sqlite3::memory:')
+ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 
 # Emulates models stored in another database
 class AnotherDb < ActiveRecord::Base
-  establish_connection 'sqlite3::memory:'
+  establish_connection(adapter: 'sqlite3', database: ':memory:')
 end
 
 RSpec.configure do |config|

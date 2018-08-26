@@ -4,6 +4,7 @@ require 'active_record'
 
 require 'after_commit_everywhere/version'
 require 'after_commit_everywhere/wrap'
+require 'extensions/active_record/connection_adapters/abstract/database_statements'
 
 # Module allowing to use ActiveRecord transactional callbacks outside of
 # ActiveRecord models, literally everywhere in your application.
@@ -91,7 +92,12 @@ module AfterCommitEverywhere
 
     def in_transaction?(connection)
       # service transactions (tests and database_cleaner) are not joinable
-      connection.transaction_open? && connection.current_transaction.joinable?
+      is_current_transaction_joinable = if Gem.loaded_specs["activerecord"].version < Gem::Version.create('4.2')
+        connection.instance_variable_get(:@transaction_joinable)
+      else
+        connection.current_transaction.joinable?
+      end
+      connection.transaction_open? && is_current_transaction_joinable
     end
   end
 end
