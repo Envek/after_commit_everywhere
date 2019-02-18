@@ -45,6 +45,6 @@ RSpec.describe "use_transactional_tests=true" do
 
   it "doesn't raise with transaction and after_commit" do
     expect { ActiveRecord::Base.transaction { after_commit { subject } } }
-        .not_to raise_error
+      .not_to raise_error
   end
 end

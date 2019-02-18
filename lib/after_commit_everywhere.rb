@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'active_record'
+require "active_record"
 
-require 'after_commit_everywhere/version'
-require 'after_commit_everywhere/wrap'
+require "after_commit_everywhere/version"
+require "after_commit_everywhere/wrap"
 
 # Module allowing to use ActiveRecord transactional callbacks outside of
 # ActiveRecord models, literally everywhere in your application.
@@ -42,6 +42,7 @@ module AfterCommitEverywhere
     if ActiveRecord::VERSION::MAJOR < 5
       raise NotImplementedError, "#{__callee__} works only with Rails 5.0+"
     end
+
     AfterCommitEverywhere.register_callback(
       connection: connection,
       name: __callee__,
@@ -72,6 +73,7 @@ module AfterCommitEverywhere
   class << self
     def register_callback(connection:, name:, no_tx_action:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
+
       unless in_transaction?(connection)
         case no_tx_action
         when :warn_and_execute
