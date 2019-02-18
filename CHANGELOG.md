@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 0.1.3 (2019-02-18)
+
+- Make `in_transaction?` helper method public. ([@Envek])
+
 ## 0.1.2 (2018-05-01)
 
 - [PR [#1](https://github.com/Envek/after_commit_everywhere/pull/1)] Enable ActiveRecord 4.2 support. ([@arjun810], [@Envek])

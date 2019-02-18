@@ -322,4 +322,18 @@ RSpec.describe AfterCommitEverywhere do
       end
     end
   end
+
+  describe ".in_transaction?" do
+    subject { described_class.in_transaction? }
+
+    it "returns true when in transaction" do
+      ActiveRecord::Base.transaction do
+        is_expected.to be_truthy
+      end
+    end
+
+    it "returns false when not in transaction" do
+      is_expected.to be_falsey
+    end
+  end
 end

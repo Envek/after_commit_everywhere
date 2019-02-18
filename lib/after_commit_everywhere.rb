@@ -89,9 +89,8 @@ module AfterCommitEverywhere
       connection.add_transaction_record(wrap)
     end
 
-    private
-
-    def in_transaction?(connection)
+    # Helper method to determine whether we're currently in transaction or not
+    def in_transaction?(connection = ActiveRecord::Base.connection)
       # service transactions (tests and database_cleaner) are not joinable
       connection.transaction_open? && connection.current_transaction.joinable?
     end
