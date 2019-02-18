@@ -11,20 +11,22 @@ addons:
 
 matrix:
   include:
-    - rvm: 2.5.1
+    - rvm: 2.5.3
       gemfile: gemfiles/activerecord_4_2.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.5.3
       gemfile: gemfiles/activerecord_5_0.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.5.3
       gemfile: gemfiles/activerecord_5_1.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.4.5
       gemfile: gemfiles/activerecord_5_2.gemfile
-    - rvm: 2.5.1
+    - rvm: 2.3.8
+      gemfile: gemfiles/activerecord_5_2.gemfile
+    - rvm: 2.5.3
+      gemfile: gemfiles/activerecord_5_2.gemfile
+    - rvm: 2.6.1
+      gemfile: gemfiles/activerecord_5_2.gemfile
+    - rvm: 2.6.1
       gemfile: gemfiles/activerecord_master.gemfile
-    - rvm: 2.4.4
-      gemfile: gemfiles/activerecord_5_2.gemfile
-    - rvm: 2.3.7
-      gemfile: gemfiles/activerecord_5_2.gemfile
 
 # https://github.com/travis-ci/travis-ci/issues/8969#issuecomment-380028168
 before_install:
