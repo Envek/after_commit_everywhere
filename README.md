@@ -7,7 +7,7 @@ Allows to use ActiveRecord transactional callbacks outside of ActiveRecord model
 
 Inspired by these articles:
 
- - https://dev.to/evilmartians/rails-aftercommit-everywhere--4j9g
+ - https://evilmartians.com/chronicles/rails-after_commit-everywhere
  - https://blog.arkency.com/2015/10/run-it-in-background-job-after-commit/
 
 <a href="https://evilmartians.com/?utm_source=after_commit_everywhere&utm_campaign=project_page"><img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
