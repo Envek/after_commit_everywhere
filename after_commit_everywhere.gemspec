@@ -30,7 +30,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", ">= 4.2"
   spec.add_development_dependency "appraisal"
-  spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "isolator"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "rails"
@@ -38,5 +37,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rubocop", "~> 0.64"
-  spec.add_development_dependency "sqlite3", "~> 1.3.6"
+  spec.add_development_dependency "sqlite3", "~> 1"
 end
