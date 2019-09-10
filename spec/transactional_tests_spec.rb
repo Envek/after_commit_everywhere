@@ -31,6 +31,9 @@ RSpec.describe "use_transactional_tests=true" do
   end
 
   subject do
+    # workaround for lazy transactions https://github.com/rails/rails/pull/32647
+    ActiveRecord::Base.connection.execute("SELECT 1")
+    # Boom or not to boom?
     raise Isolator::UnsafeOperationError if Isolator.within_transaction?
   end
 
