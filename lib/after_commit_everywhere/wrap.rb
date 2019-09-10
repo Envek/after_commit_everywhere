@@ -19,6 +19,10 @@ module AfterCommitEverywhere
       @handlers[:before_commit]&.call
     end
 
+    def trigger_transactional_callbacks?
+      true
+    end
+
     def committed!(*)
       @handlers[:after_commit]&.call
     end
