@@ -11,7 +11,12 @@ RSpec.describe AfterCommitEverywhere do
     expect(AfterCommitEverywhere::VERSION).not_to be nil
   end
 
-  let(:example_class) { Class.new.include(described_class) }
+  let(:example_class) do
+    Class.new do
+      include ::AfterCommitEverywhere
+      alias_method :aliased_after_commit, :after_commit
+    end
+  end
   let(:handler) { spy("handler") }
 
   describe "#after_commit" do
@@ -37,6 +42,23 @@ RSpec.describe AfterCommitEverywhere do
           raise ActiveRecord::Rollback
         end
         expect(handler).not_to have_received(:call)
+      end
+
+      context 'aliased DSL method' do
+        subject do
+          example_class.new.aliased_after_commit do
+            handler.call
+            expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+          end
+        end
+
+        it "executes code only after commit" do
+          ActiveRecord::Base.transaction do
+            subject
+            expect(handler).not_to have_received(:call)
+          end
+          expect(handler).to have_received(:call)
+        end
       end
     end
 
