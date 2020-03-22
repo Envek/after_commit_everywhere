@@ -2,6 +2,8 @@ AllCops:
   TargetRubyVersion: 2.3
   UseCache: false
   DisplayCopNames: true
+  Exclude:
+    - "gemfiles/*"
 
 Metrics/LineLength:
   Max: 100
@@ -24,7 +26,7 @@ Metrics/BlockLength:
     - "spec/**/*.*"
     - "*.gemspec"
 
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Exclude:
     - "spec/**/*.*"
 
@@ -48,3 +50,12 @@ Style/TrailingCommaInHashLiteral:
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true

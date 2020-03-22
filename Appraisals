@@ -29,4 +29,5 @@ appraise "activerecord-master" do
   gem "rails", git: "https://github.com/rails/rails.git"
   gem "activerecord", git: "https://github.com/rails/rails.git"
   gem "sqlite3", "~> 1.4"
+  gem "rspec-rails", "~> 4.0.0.rc1"
 end
