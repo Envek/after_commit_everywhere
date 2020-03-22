@@ -23,7 +23,7 @@ module AfterCommitEverywhere
   def after_commit(connection: ActiveRecord::Base.connection, &callback)
     AfterCommitEverywhere.register_callback(
       connection: connection,
-      name: __callee__,
+      name: __method__,
       callback: callback,
       no_tx_action: :execute,
     )
@@ -40,12 +40,12 @@ module AfterCommitEverywhere
   # @return           void
   def before_commit(connection: ActiveRecord::Base.connection, &callback)
     if ActiveRecord::VERSION::MAJOR < 5
-      raise NotImplementedError, "#{__callee__} works only with Rails 5.0+"
+      raise NotImplementedError, "#{__method__} works only with Rails 5.0+"
     end
 
     AfterCommitEverywhere.register_callback(
       connection: connection,
-      name: __callee__,
+      name: __method__,
       callback: callback,
       no_tx_action: :warn_and_execute,
     )
@@ -64,7 +64,7 @@ module AfterCommitEverywhere
   def after_rollback(connection: ActiveRecord::Base.connection, &callback)
     AfterCommitEverywhere.register_callback(
       connection: connection,
-      name: __callee__,
+      name: __method__,
       callback: callback,
       no_tx_action: :exception,
     )
