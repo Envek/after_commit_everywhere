@@ -44,7 +44,7 @@ RSpec.describe AfterCommitEverywhere do
         expect(handler).not_to have_received(:call)
       end
 
-      context 'aliased DSL method' do
+      context "aliased DSL method" do
         subject do
           example_class.new.aliased_after_commit do
             handler.call
