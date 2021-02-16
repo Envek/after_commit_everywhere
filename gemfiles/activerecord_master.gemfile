@@ -2,9 +2,13 @@
 
 source "https://rubygems.org"
 
-gem "rails", git: "https://github.com/rails/rails.git"
-gem "activerecord", git: "https://github.com/rails/rails.git"
+git "https://github.com/rails/rails.git" do
+  gem "rails"
+  gem "activerecord"
+end
+
 gem "sqlite3", "~> 1.4"
-gem "rspec-rails", "~> 4.0.0.rc1"
+gem "rspec-rails", "~> 4.0"
+gem "active_attr", git: "https://github.com/Envek/active_attr.git", branch: "chore/loose-dependency-constraint"
 
 gemspec path: "../"

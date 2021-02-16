@@ -25,9 +25,21 @@ appraise "activerecord-6-0" do
   gem "sqlite3", "~> 1.4"
 end
 
-appraise "activerecord-master" do
-  gem "rails", git: "https://github.com/rails/rails.git"
-  gem "activerecord", git: "https://github.com/rails/rails.git"
+appraise "activerecord-6-1" do
+  gem "activerecord", "~> 6.1.0"
   gem "sqlite3", "~> 1.4"
-  gem "rspec-rails", "~> 4.0.0.rc1"
+  gem "rspec-rails", "~> 4.0"
+end
+
+appraise "activerecord-master" do
+  git "https://github.com/rails/rails.git" do
+    gem "rails"
+    gem "activerecord"
+  end
+
+  gem "sqlite3", "~> 1.4"
+  gem "rspec-rails", "~> 4.0"
+
+  # See https://github.com/cgriego/active_attr/pull/183
+  gem "active_attr", git: "https://github.com/Envek/active_attr.git", branch: "chore/loose-dependency-constraint"
 end
