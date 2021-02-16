@@ -1,0 +1,63 @@
+name: Run tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - 'v*'
+  schedule:
+    - cron: '42 0 1 * *' # on 1st day of every month at 00:42
+
+jobs:
+  test:
+    name: 'ActiveRecord ${{ matrix.activerecord }} on Ruby ${{ matrix.ruby }}'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: '2.5'
+            activerecord: '4.2'
+            gemfile: 'activerecord_4_2.gemfile'
+          - ruby: '2.6'
+            activerecord: '5.0'
+            gemfile: 'activerecord_5_0.gemfile'
+          - ruby: '2.6'
+            activerecord: '5.1'
+            gemfile: 'activerecord_5_1.gemfile'
+          - ruby: '2.6'
+            activerecord: '5.2'
+            gemfile: 'activerecord_5_2.gemfile'
+          - ruby: '2.7'
+            activerecord: '6.0'
+            gemfile: 'activerecord_6_0.gemfile'
+          - ruby: '2.7'
+            activerecord: '6.1'
+            gemfile: 'activerecord_6_1.gemfile'
+          - ruby: '3.0'
+            activerecord: 'HEAD'
+            gemfile: 'activerecord_master.gemfile'
+    container:
+      image: ruby:${{ matrix.ruby }}
+      env:
+        CI: true
+        BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: bundle-${{ matrix.ruby }}-${{ hashFiles('**/*.gemspec') }}-${{ hashFiles('**/Gemfile') }}
+          restore-keys: |
+            bundle-${{ matrix.ruby }}-${{ hashFiles('**/*.gemspec') }}-${{ hashFiles('**/Gemfile') }}
+            bundle-${{ matrix.ruby }}-
+      - name: Upgrade Bundler to 2.x (mostly for Rubies older than 2.7)
+        run: gem install bundler -v '~> 2.0' -v '!= 2.2.10'
+      - name: Bundle install
+        run: |
+          bundle config path vendor/bundle
+          bundle update
+      - name: Run RSpec
+        run: bundle exec rspec

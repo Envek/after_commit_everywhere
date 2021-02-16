@@ -1,5 +1,4 @@
 [![Gem Version](https://badge.fury.io/rb/after_commit_everywhere.svg)](https://rubygems.org/gems/after_commit_everywhere)
-[![Build Status](https://travis-ci.org/Envek/after_commit_everywhere.svg?branch=master)](https://travis-ci.org/Envek/after_commit_everywhere)
 
 # `after_commit` everywhere
 
