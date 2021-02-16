@@ -203,7 +203,7 @@ DEPENDENCIES
   after_commit_everywhere!
   appraisal
   bundler (~> 2.0)
-  isolator
+  isolator (~> 0.7)
   pry
   rails
   rake (~> 13.0)

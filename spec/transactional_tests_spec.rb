@@ -23,7 +23,6 @@ RSpec.describe "use_transactional_tests=true" do
 
   before(:all) do
     Isolator.enable!
-    Isolator.transactions_threshold = 2
   end
 
   after(:all) do
