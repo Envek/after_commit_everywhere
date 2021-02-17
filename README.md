@@ -2,7 +2,7 @@
 
 # `after_commit` everywhere
 
-Allows to use ActiveRecord transactional callbacks outside of ActiveRecord models, literally everywhere in your application.
+Allows to use ActiveRecord transactional callbacks **outside** of ActiveRecord models, literally everywhere in your application.
 
 Inspired by these articles:
 
@@ -113,6 +113,25 @@ Please keep in mind ActiveRecord's [limitations for rolling back nested transact
 
 **Yes**.
 
+### Be aware of mental traps
+
+While it is convenient to have `after_commit` method at a class level to be able to call it from anywhere, take care not to call it on models.
+
+So, **DO NOT DO THIS**:
+
+```ruby
+class Post < ActiveRecord::Base
+  def self.bulk_ops
+    find_each do
+      after_commit { raise "Some doesn't expect that this screw up everything, but they should" }
+    end
+  end
+end
+```
+
+By calling [the class level `after_commit` method on models](https://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#method-i-after_commit), you're effectively adding callback for all `Post` instances, including **future** ones.
+
+See https://github.com/Envek/after_commit_everywhere/issues/13 for details.
 
 ## Development
 
