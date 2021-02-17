@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.0.0 (2021-02-17)
+
+Declare gem as stable. No changes since 0.1.5.
+
+See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discussion.
+
 ## 0.1.5 (2020-03-22)
 
 ### Fixed
