@@ -55,6 +55,12 @@ ActiveRecord::Base.transaction do
 end
 ```
 
+Or call it directly on module:
+
+```ruby
+AfterCommitEverywhere.after_commit { puts "We're all done!" }
+```
+
 That's it!
 
 But the main benefit is that it works with nested `transaction` blocks (may be even spread across many files in your codebase):
@@ -106,6 +112,12 @@ Will be executed right after transaction in which it have been declared was roll
 If called outside transaction will raise an exception!
 
 Please keep in mind ActiveRecord's [limitations for rolling back nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions).
+
+### Available helper methods
+
+#### `in_transaction?`
+
+Returns `true` when called inside open transaction, `false` otherwise.
 
 ### FAQ
 

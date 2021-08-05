@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Allow to call transactional callbacks directly on `AfterCommitEverywhere` module:
+
+  ```ruby
+  AfterCommitEverywhere.after_commit { puts "If you see me then transaction has been successfully commited!" }
+  ```
+
+- Allow to call `in_transaction?` helper method from instance methods in classes that includes `AfterCommitEverywhere` module.
+
 ## 1.0.0 (2021-02-17)
 
 Declare gem as stable. No changes since 0.1.5.

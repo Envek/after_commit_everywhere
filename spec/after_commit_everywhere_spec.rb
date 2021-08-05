@@ -345,6 +345,54 @@ RSpec.describe AfterCommitEverywhere do
     end
   end
 
+  describe "#in_transaction?" do
+    subject { example_class.new.in_transaction? }
+
+    it "returns true when in transaction" do
+      ActiveRecord::Base.transaction do
+        is_expected.to be_truthy
+      end
+    end
+
+    it "returns false when not in transaction" do
+      is_expected.to be_falsey
+    end
+  end
+
+  describe ".after_commit" do
+    subject do
+      described_class.after_commit do
+        handler.call
+        expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+      end
+    end
+
+    it "executes code only after commit" do
+      ActiveRecord::Base.transaction do
+        subject
+        expect(handler).not_to have_received(:call)
+      end
+      expect(handler).to have_received(:call)
+    end
+
+    # Here we're checking only happy path. for other tests see "#after_commit"
+  end
+
+  describe ".after_rollback" do
+    subject { described_class.after_rollback { handler.call } }
+
+    it "executes code only after rollback" do
+      ActiveRecord::Base.transaction do
+        subject
+        expect(handler).not_to have_received(:call)
+        raise ActiveRecord::Rollback
+      end
+      expect(handler).to have_received(:call)
+    end
+
+    # Here we're checking only happy path. for other tests see "#after_rollback"
+  end
+
   describe ".in_transaction?" do
     subject { described_class.in_transaction? }
 

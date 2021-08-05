@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "active_record"
+require "active_support/core_ext/module/delegation"
 
 require "after_commit_everywhere/version"
 require "after_commit_everywhere/wrap"
@@ -12,65 +13,69 @@ require "after_commit_everywhere/wrap"
 module AfterCommitEverywhere
   class NotInTransaction < RuntimeError; end
 
-  # Runs +callback+ after successful commit of outermost transaction for
-  # database +connection+.
-  #
-  # If called outside transaction it will execute callback immediately.
-  #
-  # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
-  # @param callback   [#call] Callback to be executed
-  # @return           void
-  def after_commit(connection: ActiveRecord::Base.connection, &callback)
-    AfterCommitEverywhere.register_callback(
-      connection: connection,
-      name: __method__,
-      callback: callback,
-      no_tx_action: :execute,
-    )
-  end
-
-  # Runs +callback+ before committing of outermost transaction for +connection+.
-  #
-  # If called outside transaction it will execute callback immediately.
-  #
-  # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
-  #
-  # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
-  # @param callback   [#call] Callback to be executed
-  # @return           void
-  def before_commit(connection: ActiveRecord::Base.connection, &callback)
-    if ActiveRecord::VERSION::MAJOR < 5
-      raise NotImplementedError, "#{__method__} works only with Rails 5.0+"
-    end
-
-    AfterCommitEverywhere.register_callback(
-      connection: connection,
-      name: __method__,
-      callback: callback,
-      no_tx_action: :warn_and_execute,
-    )
-  end
-
-  # Runs +callback+ after rolling back of transaction or savepoint (if declared
-  # in nested transaction) for database +connection+.
-  #
-  # Caveat: do not raise +ActivRecord::Rollback+ in nested transaction block!
-  # See http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions
-  #
-  # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
-  # @param callback   [#call] Callback to be executed
-  # @return           void
-  # @raise            [NotInTransaction] if called outside transaction.
-  def after_rollback(connection: ActiveRecord::Base.connection, &callback)
-    AfterCommitEverywhere.register_callback(
-      connection: connection,
-      name: __method__,
-      callback: callback,
-      no_tx_action: :exception,
-    )
-  end
+  delegate :after_commit, :before_commit, :after_rollback, to: AfterCommitEverywhere
+  delegate :in_transaction?, to: AfterCommitEverywhere
 
   class << self
+    # Runs +callback+ after successful commit of outermost transaction for
+    # database +connection+.
+    #
+    # If called outside transaction it will execute callback immediately.
+    #
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param callback   [#call] Callback to be executed
+    # @return           void
+    def after_commit(connection: ActiveRecord::Base.connection, &callback)
+      register_callback(
+        connection: connection,
+        name: __method__,
+        callback: callback,
+        no_tx_action: :execute,
+      )
+    end
+
+    # Runs +callback+ before committing of outermost transaction for +connection+.
+    #
+    # If called outside transaction it will execute callback immediately.
+    #
+    # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
+    #
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param callback   [#call] Callback to be executed
+    # @return           void
+    def before_commit(connection: ActiveRecord::Base.connection, &callback)
+      if ActiveRecord::VERSION::MAJOR < 5
+        raise NotImplementedError, "#{__method__} works only with Rails 5.0+"
+      end
+
+      register_callback(
+        connection: connection,
+        name: __method__,
+        callback: callback,
+        no_tx_action: :warn_and_execute,
+      )
+    end
+
+    # Runs +callback+ after rolling back of transaction or savepoint (if declared
+    # in nested transaction) for database +connection+.
+    #
+    # Caveat: do not raise +ActivRecord::Rollback+ in nested transaction block!
+    # See http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions
+    #
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param callback   [#call] Callback to be executed
+    # @return           void
+    # @raise            [NotInTransaction] if called outside transaction.
+    def after_rollback(connection: ActiveRecord::Base.connection, &callback)
+      register_callback(
+        connection: connection,
+        name: __method__,
+        callback: callback,
+        no_tx_action: :exception,
+      )
+    end
+
+    # @api private
     def register_callback(connection:, name:, no_tx_action:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
 

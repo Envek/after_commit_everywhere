@@ -3,6 +3,7 @@ PATH
   specs:
     after_commit_everywhere (1.0.0)
       activerecord (>= 4.2)
+      activesupport
 
 GEM
   remote: https://rubygems.org/
