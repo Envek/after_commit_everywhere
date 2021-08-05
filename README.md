@@ -145,6 +145,34 @@ By calling [the class level `after_commit` method on models](https://api.rubyonr
 
 See https://github.com/Envek/after_commit_everywhere/issues/13 for details.
 
+#### But what if I want to use it inside models anyway?
+
+In class-level methods call `AfterCommitEverywhere.after_commit` directly:
+
+```ruby
+class Post < ActiveRecord::Base
+  def self.bulk_ops
+    find_each do
+       AfterCommitEverywhere.after_commit { puts "Now it works as expected!" }
+    end
+  end
+end
+```
+
+For usage in instance-level methods include this module to your model class (or right into your `ApplicationRecord`):
+
+```ruby
+class Post < ActiveRecord::Base
+  include AfterCommitEverywhere
+
+  def do_some_stuff
+    after_commit { puts "Now it works!" }
+  end
+end
+```
+
+However, if you do something in models that requires defining such ad-hoc transactional callbacks, it may indicate that your models have too many responsibilities and these methods should be extracted to separate secialized layers (service objects, etc).
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
