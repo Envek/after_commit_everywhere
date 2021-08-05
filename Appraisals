@@ -39,7 +39,4 @@ appraise "activerecord-master" do
 
   gem "sqlite3", "~> 1.4"
   gem "rspec-rails", "~> 4.0"
-
-  # See https://github.com/cgriego/active_attr/pull/183
-  gem "active_attr", git: "https://github.com/Envek/active_attr.git", branch: "chore/loose-dependency-constraint"
 end

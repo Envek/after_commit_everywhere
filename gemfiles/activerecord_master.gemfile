@@ -9,6 +9,5 @@ end
 
 gem "sqlite3", "~> 1.4"
 gem "rspec-rails", "~> 4.0"
-gem "active_attr", git: "https://github.com/Envek/active_attr.git", branch: "chore/loose-dependency-constraint"
 
 gemspec path: "../"
