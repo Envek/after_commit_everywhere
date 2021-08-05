@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 1.1.0 (2021-08-05)
+
 ### Added
 
 - Allow to call transactional callbacks directly on `AfterCommitEverywhere` module:
