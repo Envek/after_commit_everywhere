@@ -171,7 +171,7 @@ class Post < ActiveRecord::Base
 end
 ```
 
-However, if you do something in models that requires defining such ad-hoc transactional callbacks, it may indicate that your models have too many responsibilities and these methods should be extracted to separate secialized layers (service objects, etc).
+However, if you do something in models that requires defining such ad-hoc transactional callbacks, it may indicate that your models have too many responsibilities and these methods should be extracted to separate specialized layers (service objects, etc).
 
 ## Development
 
