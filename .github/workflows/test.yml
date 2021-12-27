@@ -37,6 +37,9 @@ jobs:
             activerecord: '6.1'
             gemfile: 'activerecord_6_1.gemfile'
           - ruby: '3.0'
+            activerecord: '7.0'
+            gemfile: 'activerecord_7_0.gemfile'
+          - ruby: '3.1'
             activerecord: 'HEAD'
             gemfile: 'activerecord_master.gemfile'
     container:

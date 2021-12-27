@@ -2,11 +2,7 @@
 
 source "https://rubygems.org"
 
-git "https://github.com/rails/rails.git" do
-  gem "rails"
-  gem "activerecord"
-end
-
+gem "activerecord", "~> 7.0.0"
 gem "sqlite3", "~> 1.4"
 gem "rspec-rails", "~> 5.0"
 
