@@ -20,8 +20,10 @@ RSpec.describe AfterCommitEverywhere do
   let(:handler) { spy("handler") }
 
   describe "#after_commit" do
+    let(:no_tx_action) { described_class::EXECUTE }
+
     subject do
-      example_class.new.after_commit do
+      example_class.new.after_commit(no_tx_action) do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
       end
@@ -70,6 +72,38 @@ RSpec.describe AfterCommitEverywhere do
 
       it "doesn't print any warnings as it is expected behaviour" do
         expect { subject }.not_to output.to_stderr
+      end
+
+      context "with no_tx_action set to WARN_AND_EXECUTE" do
+        let(:no_tx_action) { described_class::WARN_AND_EXECUTE }
+
+        it "logs a warning and executes the block" do
+          expect { subject }.to output(anything).to_stderr
+          expect(handler).to have_received(:call)
+        end
+      end
+
+      context "with no_tx_action set to EXCEPTION" do
+        let(:no_tx_action) { described_class::EXCEPTION }
+
+        it "raises an exception" do
+          expect { subject }.to raise_error(
+            AfterCommitEverywhere::NotInTransaction
+          )
+          expect(handler).not_to have_received(:call)
+        end
+      end
+
+      context "with no_tx_action set to an invalid value" do
+        let(:no_tx_action) { "INVALID-NO-TX-ACTION" }
+
+        it "raises an execption" do
+          expect { subject }.to raise_error(
+            ArgumentError,
+            "Invalid \"no_tx_action\": \"INVALID-NO-TX-ACTION\""
+          )
+          expect(handler).not_to have_received(:call)
+        end
       end
     end
 
@@ -138,8 +172,10 @@ RSpec.describe AfterCommitEverywhere do
   end
 
   describe "#before_commit" do
+    let(:no_tx_action) { described_class::WARN_AND_EXECUTE }
+
     subject do
-      example_class.new.before_commit do
+      example_class.new.before_commit(no_tx_action) do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
       end
@@ -174,7 +210,7 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "without transaction" do
-      subject { example_class.new.before_commit { handler.call } }
+      subject { example_class.new.before_commit(no_tx_action) { handler.call } }
 
       it "executes code immediately" do
         subject
@@ -183,6 +219,38 @@ RSpec.describe AfterCommitEverywhere do
 
       it "warns as it is unclear whether it is expected behaviour or not" do
         expect { subject }.to output(anything).to_stderr
+      end
+
+      context "with no_tx_action set to EXECUTE" do
+        let(:no_tx_action) { described_class::EXECUTE }
+
+        it "executes the handler without logging a warning" do
+          expect { subject }.not_to output.to_stderr
+          expect(handler).to have_received(:call)
+        end
+      end
+
+      context "with no_tx_action set to EXCEPTION" do
+        let(:no_tx_action) { described_class::EXCEPTION }
+
+        it "raises an exception" do
+          expect { subject }.to raise_error(
+            AfterCommitEverywhere::NotInTransaction
+          )
+          expect(handler).not_to have_received(:call)
+        end
+      end
+
+      context "with no_tx_action set to an invalid value" do
+        let(:no_tx_action) { "INVALID-NO-TX-ACTION" }
+
+        it "raises an execption" do
+          expect { subject }.to raise_error(
+            ArgumentError,
+            "Invalid \"no_tx_action\": \"INVALID-NO-TX-ACTION\""
+          )
+          expect(handler).not_to have_received(:call)
+        end
       end
     end
 
