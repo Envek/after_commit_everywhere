@@ -30,24 +30,24 @@ module AfterCommitEverywhere
     # Runs +callback+ after successful commit of outermost transaction for
     # database +connection+.
     #
-    # @param no_tx_action [Symbol] Determines the behavior of this function when
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
     #   Must be one of: {EXCEPTION}, {EXECUTE}, or {WARN_AND_EXECUTE}.
     #
-    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
     # @param callback   [#call] Callback to be executed
     # @return           void
     def after_commit(
-      no_tx_action = EXECUTE,
       connection: ActiveRecord::Base.connection,
+      without_tx: EXECUTE,
       &callback
     )
       register_callback(
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: no_tx_action,
+        without_tx: without_tx,
       )
     end
 
@@ -55,17 +55,17 @@ module AfterCommitEverywhere
     #
     # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
     #
-    # @param no_tx_action [Symbol] Determines the behavior of this function when
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
     #   Must be one of: {EXCEPTION}, {EXECUTE}, or {WARN_AND_EXECUTE}.
     #
-    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
     # @param callback   [#call] Callback to be executed
     # @return           void
     def before_commit(
-      no_tx_action = WARN_AND_EXECUTE,
       connection: ActiveRecord::Base.connection,
+      without_tx: WARN_AND_EXECUTE,
       &callback
     )
       if ActiveRecord::VERSION::MAJOR < 5
@@ -76,7 +76,7 @@ module AfterCommitEverywhere
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: no_tx_action,
+        without_tx: without_tx,
       )
     end
 
@@ -95,25 +95,25 @@ module AfterCommitEverywhere
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: EXCEPTION,
+        without_tx: EXCEPTION,
       )
     end
 
     # @api private
-    def register_callback(connection:, name:, no_tx_action:, callback:)
+    def register_callback(connection:, name:, without_tx:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
 
       unless in_transaction?(connection)
-        case no_tx_action
-        when :warn_and_execute
+        case without_tx
+        when WARN_AND_EXECUTE
           warn "#{name}: No transaction open. Executing callback immediately."
           return callback.call
-        when :execute
+        when EXECUTE
           return callback.call
-        when :exception
+        when EXCEPTION
           raise NotInTransaction, "#{name} is useless outside transaction"
         else
-          raise ArgumentError, "Invalid \"no_tx_action\": \"#{no_tx_action}\""
+          raise ArgumentError, "Invalid \"without_tx\": \"#{without_tx}\""
         end
       end
       wrap = Wrap.new(connection: connection, "#{name}": callback)

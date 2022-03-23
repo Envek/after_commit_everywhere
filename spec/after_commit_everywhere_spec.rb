@@ -20,10 +20,10 @@ RSpec.describe AfterCommitEverywhere do
   let(:handler) { spy("handler") }
 
   describe "#after_commit" do
-    let(:no_tx_action) { described_class::EXECUTE }
+    let(:without_tx) { described_class::EXECUTE }
 
     subject do
-      example_class.new.after_commit(no_tx_action) do
+      example_class.new.after_commit(without_tx: without_tx) do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
       end
@@ -74,8 +74,8 @@ RSpec.describe AfterCommitEverywhere do
         expect { subject }.not_to output.to_stderr
       end
 
-      context "with no_tx_action set to WARN_AND_EXECUTE" do
-        let(:no_tx_action) { described_class::WARN_AND_EXECUTE }
+      context "with without_tx set to WARN_AND_EXECUTE" do
+        let(:without_tx) { described_class::WARN_AND_EXECUTE }
 
         it "logs a warning and executes the block" do
           expect { subject }.to output(anything).to_stderr
@@ -83,8 +83,8 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with no_tx_action set to EXCEPTION" do
-        let(:no_tx_action) { described_class::EXCEPTION }
+      context "with without_tx set to EXCEPTION" do
+        let(:without_tx) { described_class::EXCEPTION }
 
         it "raises an exception" do
           expect { subject }.to raise_error(
@@ -94,13 +94,13 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with no_tx_action set to an invalid value" do
-        let(:no_tx_action) { "INVALID-NO-TX-ACTION" }
+      context "with without_tx set to an invalid value" do
+        let(:without_tx) { "INVALID-NO-TX-ACTION" }
 
         it "raises an execption" do
           expect { subject }.to raise_error(
             ArgumentError,
-            "Invalid \"no_tx_action\": \"INVALID-NO-TX-ACTION\""
+            "Invalid \"without_tx\": \"INVALID-NO-TX-ACTION\""
           )
           expect(handler).not_to have_received(:call)
         end
@@ -172,10 +172,10 @@ RSpec.describe AfterCommitEverywhere do
   end
 
   describe "#before_commit" do
-    let(:no_tx_action) { described_class::WARN_AND_EXECUTE }
+    let(:without_tx) { described_class::WARN_AND_EXECUTE }
 
     subject do
-      example_class.new.before_commit(no_tx_action) do
+      example_class.new.before_commit(without_tx: without_tx) do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
       end
@@ -210,7 +210,11 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "without transaction" do
-      subject { example_class.new.before_commit(no_tx_action) { handler.call } }
+      subject do
+        example_class.new.before_commit(without_tx: without_tx) do
+          handler.call
+        end
+      end
 
       it "executes code immediately" do
         subject
@@ -221,8 +225,8 @@ RSpec.describe AfterCommitEverywhere do
         expect { subject }.to output(anything).to_stderr
       end
 
-      context "with no_tx_action set to EXECUTE" do
-        let(:no_tx_action) { described_class::EXECUTE }
+      context "with without_tx set to EXECUTE" do
+        let(:without_tx) { described_class::EXECUTE }
 
         it "executes the handler without logging a warning" do
           expect { subject }.not_to output.to_stderr
@@ -230,8 +234,8 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with no_tx_action set to EXCEPTION" do
-        let(:no_tx_action) { described_class::EXCEPTION }
+      context "with without_tx set to EXCEPTION" do
+        let(:without_tx) { described_class::EXCEPTION }
 
         it "raises an exception" do
           expect { subject }.to raise_error(
@@ -241,13 +245,13 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with no_tx_action set to an invalid value" do
-        let(:no_tx_action) { "INVALID-NO-TX-ACTION" }
+      context "with without_tx set to an invalid value" do
+        let(:without_tx) { "INVALID-NO-TX-ACTION" }
 
         it "raises an execption" do
           expect { subject }.to raise_error(
             ArgumentError,
-            "Invalid \"no_tx_action\": \"INVALID-NO-TX-ACTION\""
+            "Invalid \"without_tx\": \"INVALID-NO-TX-ACTION\""
           )
           expect(handler).not_to have_received(:call)
         end
