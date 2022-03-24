@@ -23,7 +23,7 @@ RSpec.describe AfterCommitEverywhere do
     let(:without_tx) { described_class::EXECUTE }
 
     subject do
-      example_class.new.after_commit(without_tx: without_tx) do
+      example_class.new.after_commit do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
       end
