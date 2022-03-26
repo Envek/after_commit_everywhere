@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## 1.2.0 (2022-03-26)
 
 ### Added
 
@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
    - `:execute` to execute callback immediately
    - `:warn_and_execute` to print warning and execute immediately
    - `:raise` to raise an exception instead of executing
+
+  [Pull request #18](https://github.com/Envek/after_commit_everywhere/pull/18) by [@lolripgg][].
 
 ## 1.1.0 (2021-08-05)
 
@@ -70,3 +72,4 @@ See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discus
 [@arjun810]: https://github.com/arjun810 "Arjun Singh" 
 [@joevandyk]: https://github.com/joevandyk "Joe Van Dyk"
 [@stokarenko]: https://github.com/stokarenko "Sergey Tokarenko"
+[@lolripgg]: https://github.com/lolripgg "James Brewer"
