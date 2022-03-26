@@ -88,8 +88,8 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with without_tx set to EXCEPTION" do
-        let(:without_tx) { described_class::EXCEPTION }
+      context "with without_tx set to RAISE" do
+        let(:without_tx) { described_class::RAISE }
 
         it "raises an exception" do
           expect { subject }.to raise_error(
@@ -239,8 +239,8 @@ RSpec.describe AfterCommitEverywhere do
         end
       end
 
-      context "with without_tx set to EXCEPTION" do
-        let(:without_tx) { described_class::EXCEPTION }
+      context "with without_tx set to RAISE" do
+        let(:without_tx) { described_class::RAISE }
 
         it "raises an exception" do
           expect { subject }.to raise_error(

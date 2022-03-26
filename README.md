@@ -119,6 +119,15 @@ Please keep in mind ActiveRecord's [limitations for rolling back nested transact
 
 Returns `true` when called inside open transaction, `false` otherwise.
 
+### Available callback options
+
+ - `without_tx` allows to change default callback behavior if called without transaction open.
+
+   Available values:
+    - `:execute` to execute callback immediately
+    - `:warn_and_execute` to print warning and execute immediately
+    - `:raise` to raise an exception instead of executing
+
 ### FAQ
 
 #### Does it works with transactional_test or DatabaseCleaner

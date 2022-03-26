@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Allow to change callbacks' behavior when they are called outside transaction:
+
+  ```ruby
+  AfterCommitEverywhere.after_commit(without_tx: :raise) do
+    # Will be executed only if was called within transaction
+    # Error will be raised otherwise
+  end
+  ```
+
+  Available values for `without_tx` keyword argument:
+   - `:execute` to execute callback immediately
+   - `:warn_and_execute` to print warning and execute immediately
+   - `:raise` to raise an exception instead of executing
+
 ## 1.1.0 (2021-08-05)
 
 ### Added

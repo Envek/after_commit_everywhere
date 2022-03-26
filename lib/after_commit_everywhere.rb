@@ -18,7 +18,7 @@ module AfterCommitEverywhere
 
   # Causes {before_commit} and {after_commit} to raise an exception when
   # called outside a transaction.
-  EXCEPTION = :exception
+  RAISE = :raise
   # Causes {before_commit} and {after_commit} to execute the given callback
   # immediately when called outside a transaction.
   EXECUTE = :execute
@@ -34,7 +34,7 @@ module AfterCommitEverywhere
     # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
-    #   Must be one of: {EXCEPTION}, {EXECUTE}, or {WARN_AND_EXECUTE}.
+    #   Must be one of: {RAISE}, {EXECUTE}, or {WARN_AND_EXECUTE}.
     #
     # @param callback   [#call] Callback to be executed
     # @return           void
@@ -59,7 +59,7 @@ module AfterCommitEverywhere
     # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
-    #   Must be one of: {EXCEPTION}, {EXECUTE}, or {WARN_AND_EXECUTE}.
+    #   Must be one of: {RAISE}, {EXECUTE}, or {WARN_AND_EXECUTE}.
     #
     # @param callback   [#call] Callback to be executed
     # @return           void
@@ -95,7 +95,7 @@ module AfterCommitEverywhere
         connection: connection,
         name: __method__,
         callback: callback,
-        without_tx: EXCEPTION,
+        without_tx: RAISE,
       )
     end
 
@@ -110,7 +110,7 @@ module AfterCommitEverywhere
           return callback.call
         when EXECUTE
           return callback.call
-        when EXCEPTION
+        when RAISE
           raise NotInTransaction, "#{name} is useless outside transaction"
         else
           raise ArgumentError, "Invalid \"without_tx\": \"#{without_tx}\""
