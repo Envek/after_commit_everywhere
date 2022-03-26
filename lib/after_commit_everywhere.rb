@@ -16,34 +16,58 @@ module AfterCommitEverywhere
   delegate :after_commit, :before_commit, :after_rollback, to: AfterCommitEverywhere
   delegate :in_transaction?, to: AfterCommitEverywhere
 
+  # Causes {before_commit} and {after_commit} to raise an exception when
+  # called outside a transaction.
+  RAISE = :raise
+  # Causes {before_commit} and {after_commit} to execute the given callback
+  # immediately when called outside a transaction.
+  EXECUTE = :execute
+  # Causes {before_commit} and {after_commit} to log a warning before calling
+  # the given callback immediately when called outside a transaction.
+  WARN_AND_EXECUTE = :warn_and_execute
+
   class << self
     # Runs +callback+ after successful commit of outermost transaction for
     # database +connection+.
     #
-    # If called outside transaction it will execute callback immediately.
-    #
     # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param without_tx [Symbol] Determines the behavior of this function when
+    #   called without an open transaction.
+    #
+    #   Must be one of: {RAISE}, {EXECUTE}, or {WARN_AND_EXECUTE}.
+    #
     # @param callback   [#call] Callback to be executed
     # @return           void
-    def after_commit(connection: ActiveRecord::Base.connection, &callback)
+    def after_commit(
+      connection: ActiveRecord::Base.connection,
+      without_tx: EXECUTE,
+      &callback
+    )
       register_callback(
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: :execute,
+        without_tx: without_tx,
       )
     end
 
     # Runs +callback+ before committing of outermost transaction for +connection+.
     #
-    # If called outside transaction it will execute callback immediately.
-    #
     # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
     #
     # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param without_tx [Symbol] Determines the behavior of this function when
+    #   called without an open transaction.
+    #
+    #   Must be one of: {RAISE}, {EXECUTE}, or {WARN_AND_EXECUTE}.
+    #
     # @param callback   [#call] Callback to be executed
     # @return           void
-    def before_commit(connection: ActiveRecord::Base.connection, &callback)
+    def before_commit(
+      connection: ActiveRecord::Base.connection,
+      without_tx: WARN_AND_EXECUTE,
+      &callback
+    )
       if ActiveRecord::VERSION::MAJOR < 5
         raise NotImplementedError, "#{__method__} works only with Rails 5.0+"
       end
@@ -52,7 +76,7 @@ module AfterCommitEverywhere
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: :warn_and_execute,
+        without_tx: without_tx,
       )
     end
 
@@ -71,23 +95,25 @@ module AfterCommitEverywhere
         connection: connection,
         name: __method__,
         callback: callback,
-        no_tx_action: :exception,
+        without_tx: RAISE,
       )
     end
 
     # @api private
-    def register_callback(connection:, name:, no_tx_action:, callback:)
+    def register_callback(connection:, name:, without_tx:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
 
       unless in_transaction?(connection)
-        case no_tx_action
-        when :warn_and_execute
+        case without_tx
+        when WARN_AND_EXECUTE
           warn "#{name}: No transaction open. Executing callback immediately."
           return callback.call
-        when :execute
+        when EXECUTE
           return callback.call
-        when :exception
+        when RAISE
           raise NotInTransaction, "#{name} is useless outside transaction"
+        else
+          raise ArgumentError, "Invalid \"without_tx\": \"#{without_tx}\""
         end
       end
       wrap = Wrap.new(connection: connection, "#{name}": callback)
