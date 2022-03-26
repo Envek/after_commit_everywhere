@@ -20,8 +20,6 @@ RSpec.describe AfterCommitEverywhere do
   let(:handler) { spy("handler") }
 
   describe "#after_commit" do
-    let(:without_tx) { described_class::EXECUTE }
-
     subject do
       example_class.new.after_commit do
         handler.call
@@ -65,6 +63,15 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "without transaction" do
+      let(:without_tx) { nil }
+
+      subject do
+        example_class.new.after_commit(**{without_tx: without_tx}.compact) do
+          handler.call
+          expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+        end
+      end
+
       it "executes code immediately" do
         subject
         expect(handler).to have_received(:call)
@@ -75,8 +82,6 @@ RSpec.describe AfterCommitEverywhere do
       end
 
       context "with without_tx set to WARN_AND_EXECUTE" do
-        let(:without_tx) { described_class::WARN_AND_EXECUTE }
-
         it "logs a warning and executes the block" do
           expect { subject }.to output(anything).to_stderr
           expect(handler).to have_received(:call)
@@ -172,10 +177,8 @@ RSpec.describe AfterCommitEverywhere do
   end
 
   describe "#before_commit" do
-    let(:without_tx) { described_class::WARN_AND_EXECUTE }
-
     subject do
-      example_class.new.before_commit(without_tx: without_tx) do
+      example_class.new.before_commit do
         handler.call
         expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
       end
@@ -210,8 +213,10 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "without transaction" do
+      let(:without_tx) { described_class::WARN_AND_EXECUTE }
+
       subject do
-        example_class.new.before_commit(without_tx: without_tx) do
+        example_class.new.before_commit(**{without_tx: without_tx}.compact) do
           handler.call
         end
       end

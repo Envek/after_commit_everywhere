@@ -203,7 +203,6 @@ DEPENDENCIES
   appraisal
   bundler (~> 2.0)
   isolator (~> 0.7)
-  nokogiri (~> 1.13.3)
   pry
   rails
   rake (~> 13.0)
