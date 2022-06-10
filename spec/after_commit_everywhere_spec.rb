@@ -23,7 +23,7 @@ RSpec.describe AfterCommitEverywhere do
     subject do
       example_class.new.after_commit do
         handler.call
-        expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+        expect(ActiveRecord::Base.connection.transaction_open?).to(be_falsey) if ActiveRecord::Base.connection_pool.connected?
       end
     end
 
@@ -174,6 +174,18 @@ RSpec.describe AfterCommitEverywhere do
         expect(handler).not_to have_received(:call)
       end
     end
+
+    it "doesn't leak connections" do
+      expect { subject }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
+    end
+
+    context "when connection to the database isn't established" do
+      before { ActiveRecord::Base.connection_pool.disconnect! }
+
+      it "doesn't leak connections" do
+        expect { subject }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
+      end
+    end
   end
 
   describe "#before_commit" do
@@ -259,6 +271,18 @@ RSpec.describe AfterCommitEverywhere do
             "Invalid \"without_tx\": \"INVALID-NO-TX-ACTION\""
           )
           expect(handler).not_to have_received(:call)
+        end
+      end
+
+      it "doesn't leak connections" do
+        expect { subject }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
+      end
+
+      context "when connection to the database isn't established" do
+        before { ActiveRecord::Base.connection_pool.disconnect! }
+
+        it "doesn't leak connections" do
+          expect { subject }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
         end
       end
     end

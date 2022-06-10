@@ -30,7 +30,7 @@ module AfterCommitEverywhere
     # Runs +callback+ after successful commit of outermost transaction for
     # database +connection+.
     #
-    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Database connection to operate in. Defaults to +ActiveRecord::Base.connection+
     # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
@@ -39,7 +39,7 @@ module AfterCommitEverywhere
     # @param callback   [#call] Callback to be executed
     # @return           void
     def after_commit(
-      connection: ActiveRecord::Base.connection,
+      connection: nil,
       without_tx: EXECUTE,
       &callback
     )
@@ -55,7 +55,7 @@ module AfterCommitEverywhere
     #
     # Available only since Ruby on Rails 5.0. See https://github.com/rails/rails/pull/18936
     #
-    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Database connection to operate in. Defaults to +ActiveRecord::Base.connection+
     # @param without_tx [Symbol] Determines the behavior of this function when
     #   called without an open transaction.
     #
@@ -64,7 +64,7 @@ module AfterCommitEverywhere
     # @param callback   [#call] Callback to be executed
     # @return           void
     def before_commit(
-      connection: ActiveRecord::Base.connection,
+      connection: nil,
       without_tx: WARN_AND_EXECUTE,
       &callback
     )
@@ -86,11 +86,11 @@ module AfterCommitEverywhere
     # Caveat: do not raise +ActivRecord::Rollback+ in nested transaction block!
     # See http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions
     #
-    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Database connection to operate in. Defaults to +ActiveRecord::Base.connection+
     # @param callback   [#call] Callback to be executed
     # @return           void
     # @raise            [NotInTransaction] if called outside transaction.
-    def after_rollback(connection: ActiveRecord::Base.connection, &callback)
+    def after_rollback(connection: nil, &callback)
       register_callback(
         connection: connection,
         name: __method__,
@@ -100,7 +100,7 @@ module AfterCommitEverywhere
     end
 
     # @api private
-    def register_callback(connection:, name:, without_tx:, callback:)
+    def register_callback(connection: nil, name:, without_tx:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
 
       unless in_transaction?(connection)
@@ -116,14 +116,26 @@ module AfterCommitEverywhere
           raise ArgumentError, "Invalid \"without_tx\": \"#{without_tx}\""
         end
       end
+
+      connection ||= default_connection
       wrap = Wrap.new(connection: connection, "#{name}": callback)
       connection.add_transaction_record(wrap)
     end
 
     # Helper method to determine whether we're currently in transaction or not
-    def in_transaction?(connection = ActiveRecord::Base.connection)
+    def in_transaction?(connection = nil)
+      # Don't establish new connection if not connected: we apparently not in transaction
+      return false unless connection || ActiveRecord::Base.connection_pool.connected?
+
+      connection ||= default_connection
       # service transactions (tests and database_cleaner) are not joinable
       connection.transaction_open? && connection.current_transaction.joinable?
+    end
+
+    private
+
+    def default_connection
+      ActiveRecord::Base.connection
     end
   end
 end
