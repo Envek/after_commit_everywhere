@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 1.2.1 (2022-06-10)
+
+### Fixed
+
+- Connection leak from the connection pool when `after_commit` called outside Rails executor without connection checked out
+
+  Usually all invocations of `after_commit` (whether it happens during serving HTTP request in Rails controller or performing job in Sidekiq worker process) are made inside [Rails executor](https://guides.rubyonrails.org/threading_and_code_execution.html#executor) which checks in any connections back to the connection pool that were checked out inside its block.
+
+  However, in cases when a) `after_commit` was called outside of Rails executor (3-rd party gems or non-Rails apps using ActiveRecord) **and** b) database connection hasn't been checked out yet, then connection will be checked out by `after_commit` implicitly by call to `ActiveRecord::Base.connection` and not checked in back afterwards causing it to _leak_ from the connection pool.
+
+  But in that case we can be sure that there is no transaction in progress ('cause one need to checkout connection and issue `BEGIN` to it), so we don't need to check it out at all and can fast-forward to `without_tx` action.
+
+  See discussion at [issue #20](https://github.com/Envek/after_commit_everywhere/issues/20) for details.
+
+  [Pull request #21](https://github.com/Envek/after_commit_everywhere/pull/21) by [@Envek][].
+
 ## 1.2.0 (2022-03-26)
 
 ### Added
