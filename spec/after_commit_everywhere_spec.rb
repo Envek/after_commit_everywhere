@@ -23,7 +23,7 @@ RSpec.describe AfterCommitEverywhere do
     subject do
       example_class.new.after_commit do
         handler.call
-        expect(ActiveRecord::Base.connection.transaction_open?).to(be_falsey) if ActiveRecord::Base.connection_pool.connected?
+        expect(ActiveRecord::Base.connection.transaction_open?).to(be_falsey) if ActiveRecord::Base.connection_pool.active_connection?
       end
     end
 
@@ -184,6 +184,14 @@ RSpec.describe AfterCommitEverywhere do
 
       it "doesn't leak connections" do
         expect { subject }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
+      end
+    end
+
+    context "when connection to the database has been established in another thread" do
+      before { ActiveRecord::Base.connection }
+
+      it "doesn't leak connections" do
+        expect { Thread.new { subject }.join }.not_to change { ActiveRecord::Base.connection_pool.connections.size }
       end
     end
   end

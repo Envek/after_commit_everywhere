@@ -125,7 +125,7 @@ module AfterCommitEverywhere
     # Helper method to determine whether we're currently in transaction or not
     def in_transaction?(connection = nil)
       # Don't establish new connection if not connected: we apparently not in transaction
-      return false unless connection || ActiveRecord::Base.connection_pool.connected?
+      return false unless connection || ActiveRecord::Base.connection_pool.active_connection?
 
       connection ||= default_connection
       # service transactions (tests and database_cleaner) are not joinable
