@@ -14,7 +14,7 @@ module AfterCommitEverywhere
   class NotInTransaction < RuntimeError; end
 
   delegate :after_commit, :before_commit, :after_rollback, to: AfterCommitEverywhere
-  delegate :in_transaction?, to: AfterCommitEverywhere
+  delegate :in_transaction?, :use_transaction, to: AfterCommitEverywhere
 
   # Causes {before_commit} and {after_commit} to raise an exception when
   # called outside a transaction.

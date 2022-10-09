@@ -481,28 +481,6 @@ RSpec.describe AfterCommitEverywhere do
     end
   end
 
-  describe "#use_transaction" do
-    it "rollbacks propogate up to the top level transaction block" do
-      outer_handler = spy("outer")
-      ActiveRecord::Base.transaction do
-        described_class.after_commit { outer_handler.call }
-        described_class.use_transaction do
-          raise ActiveRecord::Rollback
-        end
-      end
-
-      expect(outer_handler).not_to have_received(:call)
-      expect(handler).not_to have_received(:call)
-    end
-
-    it "runs in a new transaction if no wrapping transaction is available" do
-      expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
-      described_class.use_transaction do
-        expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
-      end
-    end
-  end
-
   describe ".after_commit" do
     subject do
       described_class.after_commit do
@@ -549,5 +527,37 @@ RSpec.describe AfterCommitEverywhere do
     it "returns false when not in transaction" do
       is_expected.to be_falsey
     end
+  end
+
+  shared_examples "verify use_transaction behavior" do
+    it "rollbacks propogate up to the top level transaction block" do
+      outer_handler = spy("outer")
+      ActiveRecord::Base.transaction do
+        described_class.after_commit { outer_handler.call }
+        receiver.use_transaction do
+          raise ActiveRecord::Rollback
+        end
+      end
+
+      expect(outer_handler).not_to have_received(:call)
+      expect(handler).not_to have_received(:call)
+    end
+
+    it "runs in a new transaction if no wrapping transaction is available" do
+      expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+      receiver.use_transaction do
+        expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
+      end
+    end
+  end
+
+  describe "#use_transaction" do
+    let(:receiver) { example_class.new }
+    include_examples "verify use_transaction behavior"
+  end
+
+  describe ".use_transaction" do
+    let(:receiver) { described_class }
+    include_examples "verify use_transaction behavior"
   end
 end
