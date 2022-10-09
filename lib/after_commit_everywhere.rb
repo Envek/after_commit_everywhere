@@ -132,6 +132,16 @@ module AfterCommitEverywhere
       connection.transaction_open? && connection.current_transaction.joinable?
     end
 
+    def use_transaction(connection = nil)
+      connection ||= default_connection
+
+      if in_transaction?(connection)
+        yield
+      else
+        connection.transaction { yield }
+      end
+    end
+
     private
 
     def default_connection

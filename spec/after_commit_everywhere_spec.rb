@@ -133,7 +133,7 @@ RSpec.describe AfterCommitEverywhere do
         expect(handler).to have_received(:call)
       end
 
-      it "doesn't execute callback when rollback issued" do
+      it "doesn't execute callback when rollback issued from :requires_new transaction" do
         outer_handler = spy("outer")
         ActiveRecord::Base.transaction do
           example_class.new.after_commit { outer_handler.call }
@@ -142,6 +142,19 @@ RSpec.describe AfterCommitEverywhere do
             raise ActiveRecord::Rollback
           end
         end
+        expect(outer_handler).to have_received(:call)
+        expect(handler).not_to have_received(:call)
+      end
+
+      it "executes callbacks when rollback issued from default nested transaction" do
+        outer_handler = spy("outer")
+        ActiveRecord::Base.transaction do
+          described_class.after_commit { outer_handler.call }
+          ActiveRecord::Base.transaction do
+            raise ActiveRecord::Rollback
+          end
+        end
+  
         expect(outer_handler).to have_received(:call)
         expect(handler).not_to have_received(:call)
       end
@@ -465,6 +478,28 @@ RSpec.describe AfterCommitEverywhere do
 
     it "returns false when not in transaction" do
       is_expected.to be_falsey
+    end
+  end
+
+  describe "#use_transaction" do
+    it "rollbacks propogate up to the top level transaction block" do
+      outer_handler = spy("outer")
+      ActiveRecord::Base.transaction do
+        described_class.after_commit { outer_handler.call }
+        described_class.use_transaction do
+          raise ActiveRecord::Rollback
+        end
+      end
+
+      expect(outer_handler).not_to have_received(:call)
+      expect(handler).not_to have_received(:call)
+    end
+
+    it "runs in a new transaction if no wrapping transaction is available" do
+      expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+      described_class.use_transaction do
+        expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
+      end
     end
   end
 
