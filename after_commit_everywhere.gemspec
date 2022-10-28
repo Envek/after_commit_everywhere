@@ -34,10 +34,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "isolator", "~> 0.7"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "rails"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rubocop", "~> 0.81.0"
   spec.add_development_dependency "sqlite3", "~> 1.3", ">= 1.3.6"
+  spec.add_development_dependency "yard"
 end

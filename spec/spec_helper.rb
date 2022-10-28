@@ -3,6 +3,7 @@
 require "bundler/setup"
 require "after_commit_everywhere"
 require "pry"
+require "pry-byebug"
 
 log = Logger.new("tmp/db.log")
 log.sev_threshold = Logger::DEBUG
