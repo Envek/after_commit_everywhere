@@ -14,7 +14,7 @@ module AfterCommitEverywhere
   class NotInTransaction < RuntimeError; end
 
   delegate :after_commit, :before_commit, :after_rollback, to: AfterCommitEverywhere
-  delegate :in_transaction?, to: AfterCommitEverywhere
+  delegate :in_transaction?, :in_transaction, to: AfterCommitEverywhere
 
   # Causes {before_commit} and {after_commit} to raise an exception when
   # called outside a transaction.
@@ -130,6 +130,20 @@ module AfterCommitEverywhere
       connection ||= default_connection
       # service transactions (tests and database_cleaner) are not joinable
       connection.transaction_open? && connection.current_transaction.joinable?
+    end
+
+    # Makes sure the provided block runs in a transaction. If we are not currently in a transaction, a new transaction is started.
+    #
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Database connection to operate in. Defaults to +ActiveRecord::Base.connection+
+    # @return           void
+    def in_transaction(connection = nil)
+      connection ||= default_connection
+
+      if in_transaction?(connection)
+        yield
+      else
+        connection.transaction { yield }
+      end
     end
 
     private

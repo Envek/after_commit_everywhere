@@ -111,13 +111,80 @@ Will be executed right after transaction in which it have been declared was roll
 
 If called outside transaction will raise an exception!
 
-Please keep in mind ActiveRecord's [limitations for rolling back nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions).
+Please keep in mind ActiveRecord's [limitations for rolling back nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions). See [`in_transaction`](#in_transaction) for a workaround to this limitation. 
 
 ### Available helper methods
 
+#### `in_transaction`
+
+Makes sure the provided block is running in a transaction.
+
+This method aims to provide clearer intention than a typical `ActiveRecord::Base.transaction` block - `in_transaction` only cares that _some_ transaction is present, not that a transaction is nested in any way.
+
+If a transaction is present, it will yield without taking any action. Note that this means `ActiveRecord::Rollback` errors will not be trapped by `in_transaction` but will propagate up to the nearest parent transaction block.
+
+If no transaction is present, the provided block will open a new transaction.
+
+```rb
+class ServiceObjectBtw
+  include AfterCommitEverywhere
+
+  def call
+    in_transaction do
+      an_update
+      another_update
+      after_commit { puts "We're all done!" }
+    end
+  end
+end
+```
+
+Our service object can run its database operations safely when run in isolation. 
+
+```rb
+ServiceObjectBtw.new.call # This opens a new #transaction block
+```
+
+If it is later called from code already wrapped in a transaction, the existing transaction will be utilized without any nesting:
+
+```rb
+ActiveRecord::Base.transaction do
+  new_update
+  next_update
+  # This no longer opens a new #transaction block, because one is already present
+  ServiceObjectBtw.new.call
+end
+```
+
+This can be called directly on the module as well:
+
+```rb
+AfterCommitEverywhere.in_transaction do
+  AfterCommitEverywhere.after_commit { puts "We're all done!" }
+end
+```
+
 #### `in_transaction?`
 
-Returns `true` when called inside open transaction, `false` otherwise.
+Returns `true` when called inside an open transaction, `false` otherwise.
+
+```rb
+def check_for_transaction
+  if in_transaction?
+    puts "We're in a transaction!"
+  else
+    puts "We're not in a transaction..."
+  end
+end
+
+check_for_transaction
+# => prints "We're not in a transaction..."
+
+in_transaction do
+  check_for_transaction
+end
+# => prints "We're in a transaction!"
+```
 
 ### Available callback options
 
