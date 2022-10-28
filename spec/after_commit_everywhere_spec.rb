@@ -529,12 +529,12 @@ RSpec.describe AfterCommitEverywhere do
     end
   end
 
-  shared_examples "verify use_transaction behavior" do
+  shared_examples "verify in_transaction behavior" do
     it "rollbacks propogate up to the top level transaction block" do
       outer_handler = spy("outer")
       ActiveRecord::Base.transaction do
         described_class.after_commit { outer_handler.call }
-        receiver.use_transaction do
+        receiver.in_transaction do
           raise ActiveRecord::Rollback
         end
       end
@@ -545,19 +545,38 @@ RSpec.describe AfterCommitEverywhere do
 
     it "runs in a new transaction if no wrapping transaction is available" do
       expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
-      receiver.use_transaction do
+      receiver.in_transaction do
         expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
+      end
+    end
+
+    context "when rolling back, the rollback propogates to the parent transaction block" do
+      subject { receiver.after_rollback { handler.call } }
+
+      it "executes all after_rollback calls, even when raising an ActiveRecord::Rollback" do
+        outer_handler = spy("outer")
+        ActiveRecord::Base.transaction do
+          receiver.after_rollback { outer_handler.call }
+          described_class.in_transaction do
+            subject
+            # ActiveRecord::Rollback works here because `in_transaction` yields without creating a new nested transaction
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        expect(handler).to have_received(:call)
+        expect(outer_handler).to have_received(:call)
       end
     end
   end
 
-  describe "#use_transaction" do
+  describe "#in_transaction" do
     let(:receiver) { example_class.new }
-    include_examples "verify use_transaction behavior"
+    include_examples "verify in_transaction behavior"
   end
 
-  describe ".use_transaction" do
+  describe ".in_transaction" do
     let(:receiver) { described_class }
-    include_examples "verify use_transaction behavior"
+    include_examples "verify in_transaction behavior"
   end
 end
