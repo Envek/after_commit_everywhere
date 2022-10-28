@@ -134,15 +134,21 @@ module AfterCommitEverywhere
 
     # Makes sure the provided block runs in a transaction. If we are not currently in a transaction, a new transaction is started.
     #
+    # It mimics the ActiveRecord's +transaction+ method's API and actually uses it under the hood.
+    #
+    # However, the main difference is that it doesn't swallow +ActiveRecord::Rollback+ exception in case when there is no transaction open.
+    #
+    # @see https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/DatabaseStatements.html#method-i-transaction
+    #
     # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Database connection to operate in. Defaults to +ActiveRecord::Base.connection+
+    # @param requires_new [Boolean] Forces creation of new subtransaction (savepoint) even if transaction is already opened.
+    # @param new_tx_options [Hash<Symbol, void>] Options to be passed to +connection.transaction+ on new transaction creation
     # @return           void
-    def in_transaction(connection = nil)
-      connection ||= default_connection
-
-      if in_transaction?(connection)
+    def in_transaction(connection = default_connection, requires_new: false, **new_tx_options)
+      if in_transaction?(connection) && !requires_new
         yield
       else
-        connection.transaction { yield }
+        connection.transaction(requires_new: requires_new, **new_tx_options) { yield }
       end
     end
 

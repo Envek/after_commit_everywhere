@@ -550,6 +550,21 @@ RSpec.describe AfterCommitEverywhere do
       end
     end
 
+    it "runs new transaction even inside existing transaction if requires_new is true" do
+      outer_handler, inner_handler = spy("outter"), spy("inner")
+      expect(ActiveRecord::Base.connection.transaction_open?).to be_falsey
+      ActiveRecord::Base.transaction do
+        expect(ActiveRecord::Base.connection.transaction_open?).to be_truthy
+        described_class.after_commit { outer_handler.call }
+        receiver.in_transaction(requires_new: true) do
+          receiver.after_commit { inner_handler.call }
+          raise ActiveRecord::Rollback
+        end
+      end
+      expect(outer_handler).to have_received(:call)
+      expect(inner_handler).not_to have_received(:call)
+    end
+
     context "when rolling back, the rollback propogates to the parent transaction block" do
       subject { receiver.after_rollback { handler.call } }
 
