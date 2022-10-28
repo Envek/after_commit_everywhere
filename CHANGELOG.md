@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 1.3.0 (2022-10-28)
+
+### Added
+
+- `in_transaction` helper method to execute code within existing transaction or start a new one if there is no tx open.
+
+  It is similar to `ActiveRecord::Base.transaction`, but it doesn't swallow `ActiveRecord::Rollback` exception in case when there is no transaction open.
+
+  See discussion at [#23](https://github.com/Envek/after_commit_everywhere/pull/23) for details.
+
+  [Pull request #23](https://github.com/Envek/after_commit_everywhere/pull/23) by [@jpcamara][].
+
+- Ability to call `in_transaction` helper with the same arguments as [`ActiveRecord::Base.transaction`](https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/DatabaseStatements.html#method-i-transaction). [@Envek][].
+
 ## 1.2.2 (2022-06-20)
 
 ### Fixed
@@ -99,3 +113,4 @@ See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discus
 [@joevandyk]: https://github.com/joevandyk "Joe Van Dyk"
 [@stokarenko]: https://github.com/stokarenko "Sergey Tokarenko"
 [@lolripgg]: https://github.com/lolripgg "James Brewer"
+[@jpcamara]: https://github.com/jpcamara "JP Camara"
