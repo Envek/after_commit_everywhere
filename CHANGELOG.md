@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 1.3.1 (2023-06-21)
+
+### Fixed
+
+- Don't include development-related files into packaged gem to avoid confusing users or software tools. [@Envek][].
+
+  See discussion at [#26](https://github.com/Envek/after_commit_everywhere/issues/26).
+
+  Files packaged after this change:
+
+      CHANGELOG.md
+      LICENSE.txt
+      README.md
+      after_commit_everywhere.gemspec
+      lib/after_commit_everywhere.rb
+      lib/after_commit_everywhere/version.rb
+      lib/after_commit_everywhere/wrap.rb
+
 ## 1.3.0 (2022-10-28)
 
 ### Added
