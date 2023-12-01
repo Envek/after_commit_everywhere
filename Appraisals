@@ -37,6 +37,12 @@ appraise "activerecord-7-0" do
   gem "rspec-rails", "~> 5.0"
 end
 
+appraise "activerecord-7-1" do
+  gem "activerecord", "~> 7.1.0"
+  gem "sqlite3", "~> 1.4"
+  gem "rspec-rails", "~> 5.0"
+end
+
 appraise "activerecord-master" do
   git "https://github.com/rails/rails.git" do
     gem "rails"
