@@ -39,11 +39,13 @@ module AfterCommitEverywhere
     # @param callback   [#call] Callback to be executed
     # @return           void
     def after_commit(
+      prepend: false,
       connection: nil,
       without_tx: EXECUTE,
       &callback
     )
       register_callback(
+        prepend: prepend,
         connection: connection,
         name: __method__,
         callback: callback,
@@ -64,6 +66,7 @@ module AfterCommitEverywhere
     # @param callback   [#call] Callback to be executed
     # @return           void
     def before_commit(
+      prepend: false,
       connection: nil,
       without_tx: WARN_AND_EXECUTE,
       &callback
@@ -73,6 +76,7 @@ module AfterCommitEverywhere
       end
 
       register_callback(
+        prepend: prepend,
         connection: connection,
         name: __method__,
         callback: callback,
@@ -90,8 +94,9 @@ module AfterCommitEverywhere
     # @param callback   [#call] Callback to be executed
     # @return           void
     # @raise            [NotInTransaction] if called outside transaction.
-    def after_rollback(connection: nil, &callback)
+    def after_rollback(prepend: false, connection: nil, &callback)
       register_callback(
+        prepend: prepend,
         connection: connection,
         name: __method__,
         callback: callback,
@@ -100,7 +105,7 @@ module AfterCommitEverywhere
     end
 
     # @api private
-    def register_callback(connection: nil, name:, without_tx:, callback:)
+    def register_callback(prepend:, connection: nil, name:, without_tx:, callback:)
       raise ArgumentError, "Provide callback to #{name}" unless callback
 
       unless in_transaction?(connection)
@@ -120,6 +125,10 @@ module AfterCommitEverywhere
       connection ||= default_connection
       wrap = Wrap.new(connection: connection, "#{name}": callback)
       connection.add_transaction_record(wrap)
+      if prepend
+        records = connection.current_transaction.instance_variable_get(:@records)
+        records.unshift(records.pop)
+      end
     end
 
     # Helper method to determine whether we're currently in transaction or not

@@ -28,6 +28,34 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "within transaction" do
+      context 'when prepend is true' do
+        let(:handler_1) { spy("handler_1") }
+        let(:handler_2) { spy("handler_2") }
+
+        it 'executes prepended callback first' do
+          ActiveRecord::Base.transaction do
+            example_class.new.after_commit { handler_1.call }
+            example_class.new.after_commit(prepend: true) { handler_2.call }
+          end
+          expect(handler_2).to have_received(:call).ordered
+          expect(handler_1).to have_received(:call).ordered
+        end
+      end
+
+      context 'when prepend is not specified' do
+        let(:handler_1) { spy("handler_1") }
+        let(:handler_2) { spy("handler_2") }
+
+        it 'executes callbacks in the order they were defined' do
+          ActiveRecord::Base.transaction do
+            example_class.new.after_commit { handler_1.call }
+            example_class.new.after_commit { handler_2.call }
+          end
+          expect(handler_1).to have_received(:call).ordered
+          expect(handler_2).to have_received(:call).ordered
+        end
+      end
+
       it "executes code only after commit" do
         ActiveRecord::Base.transaction do
           subject
