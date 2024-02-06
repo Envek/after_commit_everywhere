@@ -124,10 +124,11 @@ module AfterCommitEverywhere
 
       connection ||= default_connection
       wrap = Wrap.new(connection: connection, "#{name}": callback)
-      connection.add_transaction_record(wrap)
+
       if prepend
-        records = connection.current_transaction.instance_variable_get(:@records)
-        records.unshift(records.pop)
+        connection.current_transaction.instance_variable_get(:@records).unshift(wrap)
+      else
+        connection.add_transaction_record(wrap)
       end
     end
 
