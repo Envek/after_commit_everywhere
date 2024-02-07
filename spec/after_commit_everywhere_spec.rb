@@ -40,6 +40,17 @@ RSpec.describe AfterCommitEverywhere do
           expect(handler_2).to have_received(:call).ordered
           expect(handler_1).to have_received(:call).ordered
         end
+
+        it 'works even if it is the first callback in transaction' do
+          expect do
+            ActiveRecord::Base.transaction do
+              example_class.new.after_commit(prepend: true) { handler_2.call }
+              example_class.new.after_commit { handler_1.call }
+            end
+          end.not_to raise_error
+          expect(handler_2).to have_received(:call).ordered
+          expect(handler_1).to have_received(:call).ordered
+        end
       end
 
       context 'when prepend is not specified' do

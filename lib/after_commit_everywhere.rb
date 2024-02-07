@@ -126,7 +126,11 @@ module AfterCommitEverywhere
       wrap = Wrap.new(connection: connection, "#{name}": callback)
 
       if prepend
-        connection.current_transaction.instance_variable_get(:@records).unshift(wrap)
+        # Hacking ActiveRecord's transaction internals to prepend our callback
+        # See https://github.com/rails/rails/blob/f0d433bb46ac233ec7fd7fae48f458978908d905/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb#L148-L156
+        records = connection.current_transaction.instance_variable_get(:@records)
+        records = connection.current_transaction.instance_variable_set(:@records, []) if records.nil?
+        records.unshift(wrap)
       else
         connection.add_transaction_record(wrap)
       end
