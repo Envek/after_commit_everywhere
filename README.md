@@ -111,7 +111,7 @@ Will be executed right after transaction in which it have been declared was roll
 
 If called outside transaction will raise an exception!
 
-Please keep in mind ActiveRecord's [limitations for rolling back nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions). See [`in_transaction`](#in_transaction) for a workaround to this limitation. 
+Please keep in mind ActiveRecord's [limitations for rolling back nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions). See [`in_transaction`](#in_transaction) for a workaround to this limitation.
 
 ### Available helper methods
 
@@ -139,7 +139,7 @@ class ServiceObjectBtw
 end
 ```
 
-Our service object can run its database operations safely when run in isolation. 
+Our service object can run its database operations safely when run in isolation.
 
 ```rb
 ServiceObjectBtw.new.call # This opens a new #transaction block
@@ -194,6 +194,8 @@ end
     - `:execute` to execute callback immediately
     - `:warn_and_execute` to print warning and execute immediately
     - `:raise` to raise an exception instead of executing
+
+- `prepend` puts the callback at the head of the callback chain, instead of at the end.
 
 ### FAQ
 
