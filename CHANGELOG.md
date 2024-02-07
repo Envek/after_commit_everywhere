@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 1.4.0 (2024-02-07)
+
+### Added
+
+ - Ability to prepend callbacks to the head of callback queue using `prepend: true` option.
+
+   ```ruby
+   AfterCommitEverywhere.after_commit { puts "I'm second!" }
+   AfterCommitEverywhere.after_commit(prepend: true) { puts "I'm first!" }
+   ```
+
+   See [Pull request #30](https://github.com/Envek/after_commit_everywhere/pull/30) by [@quentindemetz][] and [@A1090][].
+
 ## 1.3.1 (2023-06-21)
 
 ### Fixed
@@ -132,3 +145,5 @@ See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discus
 [@stokarenko]: https://github.com/stokarenko "Sergey Tokarenko"
 [@lolripgg]: https://github.com/lolripgg "James Brewer"
 [@jpcamara]: https://github.com/jpcamara "JP Camara"
+[@quentindemetz]: https://github.com/quentindemetz "Quentin de Metz"
+[@A1090]: https://github.com/A1090 "Tabac Andreina"
