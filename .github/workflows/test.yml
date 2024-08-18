@@ -46,6 +46,9 @@ jobs:
             activerecord: '7.2'
             gemfile: 'activerecord_7_2.gemfile'
           - ruby: '3.3'
+            activerecord: '7.2'
+            gemfile: 'activerecord_7_2.gemfile'
+          - ruby: '3.3'
             activerecord: 'HEAD'
             gemfile: 'activerecord_master.gemfile'
     env:
