@@ -8,6 +8,6 @@ git "https://github.com/rails/rails.git" do
 end
 
 gem "sqlite3", "~> 1.4"
-gem "rspec-rails", "~> 5.0"
+gem "rspec-rails", "~> 6.0"
 
 gemspec path: "../"
