@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Ability to propagate exception for multiple `after_commit` callbacks within transaction. Should handle exception inside callback to avoid stopping other callbacks.  
-  See [Issue #34](https://github.com/Envek/after_commit_everywhere/issues/34) by [@kevink1103]() and [@njw1203]().
+- Ability to propagate exception for multiple `after_commit` callbacks within transaction. Should handle exception inside callback to avoid stopping other callbacks.
+
+  [Pull request #35](https://github.com/Envek/after_commit_everywhere/pull/35) by [@kevink1103](). Also see discussion at [#34](https://github.com/Envek/after_commit_everywhere/issues/34).
 
 ## 1.4.0 (2024-02-07)
 
@@ -154,3 +155,4 @@ See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discus
 [@jpcamara]: https://github.com/jpcamara "JP Camara"
 [@quentindemetz]: https://github.com/quentindemetz "Quentin de Metz"
 [@A1090]: https://github.com/A1090 "Tabac Andreina"
+[@kevink1103]: https://github.com/kevink1103 "Kevin (bum)"
