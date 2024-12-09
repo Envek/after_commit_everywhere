@@ -28,10 +28,10 @@ RSpec.describe AfterCommitEverywhere do
     end
 
     context "within transaction" do
-      context 'when prepend is true' do
-        let(:handler_1) { spy("handler_1") }
-        let(:handler_2) { spy("handler_2") }
+      let(:handler_1) { spy("handler_1") }
+      let(:handler_2) { spy("handler_2") }
 
+      context 'when prepend is true' do
         it 'executes prepended callback first' do
           ActiveRecord::Base.transaction do
             example_class.new.after_commit { handler_1.call }
@@ -54,9 +54,6 @@ RSpec.describe AfterCommitEverywhere do
       end
 
       context 'when prepend is not specified' do
-        let(:handler_1) { spy("handler_1") }
-        let(:handler_2) { spy("handler_2") }
-
         it 'executes callbacks in the order they were defined' do
           ActiveRecord::Base.transaction do
             example_class.new.after_commit { handler_1.call }
@@ -98,6 +95,18 @@ RSpec.describe AfterCommitEverywhere do
           end
           expect(handler).to have_received(:call)
         end
+      end
+
+      it 'propagates an error raised in one of multiple callbacks' do
+        expect do
+          ActiveRecord::Base.transaction do
+            example_class.new.after_commit { raise 'this should prevent other callbacks being executed' }
+            example_class.new.after_commit { handler_1.call }
+            example_class.new.after_commit { handler_2.call }
+          end
+        end.to raise_error('this should prevent other callbacks being executed')
+        expect(handler_1).not_to have_received(:call)
+        expect(handler_2).not_to have_received(:call)
       end
     end
 

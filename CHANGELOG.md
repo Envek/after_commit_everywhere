@@ -4,18 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 1.5.0 (2024-12-09)
+
+### Added
+
+- Ability to propagate exception for multiple `after_commit` callbacks within transaction. Should handle exception inside callback to avoid stopping other callbacks.
+
+  [Pull request #35](https://github.com/Envek/after_commit_everywhere/pull/35) by [@kevink1103](). Also see discussion at [#34](https://github.com/Envek/after_commit_everywhere/issues/34).
+
 ## 1.4.0 (2024-02-07)
 
 ### Added
 
- - Ability to prepend callbacks to the head of callback queue using `prepend: true` option.
+- Ability to prepend callbacks to the head of callback queue using `prepend: true` option.
 
-   ```ruby
-   AfterCommitEverywhere.after_commit { puts "I'm second!" }
-   AfterCommitEverywhere.after_commit(prepend: true) { puts "I'm first!" }
-   ```
+  ```ruby
+  AfterCommitEverywhere.after_commit { puts "I'm second!" }
+  AfterCommitEverywhere.after_commit(prepend: true) { puts "I'm first!" }
+  ```
 
-   See [Pull request #30](https://github.com/Envek/after_commit_everywhere/pull/30) by [@quentindemetz][] and [@A1090][].
+  See [Pull request #30](https://github.com/Envek/after_commit_everywhere/pull/30) by [@quentindemetz][] and [@A1090][].
 
 ## 1.3.1 (2023-06-21)
 
@@ -147,3 +155,4 @@ See [#11](https://github.com/Envek/after_commit_everywhere/issues/11) for discus
 [@jpcamara]: https://github.com/jpcamara "JP Camara"
 [@quentindemetz]: https://github.com/quentindemetz "Quentin de Metz"
 [@A1090]: https://github.com/A1090 "Tabac Andreina"
+[@kevink1103]: https://github.com/kevink1103 "Kevin (bum)"
