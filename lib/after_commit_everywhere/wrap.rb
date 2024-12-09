@@ -23,8 +23,10 @@ module AfterCommitEverywhere
       true
     end
 
-    def committed!(*)
-      @handlers[:after_commit]&.call
+    def committed!(should_run_callbacks: true)
+      if should_run_callbacks
+        @handlers[:after_commit]&.call
+      end
     end
 
     def rolledback!(*)
