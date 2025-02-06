@@ -7,6 +7,7 @@ module AfterCommitEverywhere
     def initialize(connection: ActiveRecord::Base.connection, **handlers)
       @connection = connection
       @handlers = handlers
+      @locale = I18n.locale
     end
 
     # rubocop: disable Naming/PredicateName
@@ -16,7 +17,7 @@ module AfterCommitEverywhere
     # rubocop: enable Naming/PredicateName
 
     def before_committed!(*)
-      @handlers[:before_commit]&.call
+      I18n.with_locale(@locale) { @handlers[:before_commit]&.call }
     end
 
     def trigger_transactional_callbacks?
@@ -24,13 +25,13 @@ module AfterCommitEverywhere
     end
 
     def committed!(should_run_callbacks: true)
-      if should_run_callbacks
-        @handlers[:after_commit]&.call
-      end
+      return unless should_run_callbacks
+
+      I18n.with_locale(@locale) { @handlers[:after_commit]&.call }
     end
 
     def rolledback!(*)
-      @handlers[:after_rollback]&.call
+      I18n.with_locale(@locale) { @handlers[:after_rollback]&.call }
     end
 
     # Required for +transaction(requires_new: true)+

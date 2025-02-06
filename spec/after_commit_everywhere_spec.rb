@@ -108,6 +108,19 @@ RSpec.describe AfterCommitEverywhere do
         expect(handler_1).not_to have_received(:call)
         expect(handler_2).not_to have_received(:call)
       end
+
+      it "preserves the locale" do
+        I18n.enforce_available_locales = false
+
+        ActiveRecord::Base.transaction do
+          expect(I18n.locale).not_to eq(:de)
+          I18n.with_locale(:de) { example_class.new.after_commit { handler.call(I18n.locale) } }
+          expect(handler).not_to have_received(:call)
+        end
+        expect(handler).to have_received(:call).with(:de)
+
+        I18n.enforce_available_locales = true
+      end
     end
 
     context "without transaction" do
@@ -291,6 +304,19 @@ RSpec.describe AfterCommitEverywhere do
         end
         expect(handler).not_to have_received(:call)
       end
+
+      it "preserves the locale" do
+        I18n.enforce_available_locales = false
+
+        ActiveRecord::Base.transaction do
+          expect(I18n.locale).not_to eq(:de)
+          I18n.with_locale(:de) { example_class.new.before_commit { handler.call(I18n.locale) } }
+          expect(handler).not_to have_received(:call)
+        end
+        expect(handler).to have_received(:call).with(:de)
+
+        I18n.enforce_available_locales = true
+      end
     end
 
     context "without transaction" do
@@ -438,6 +464,20 @@ RSpec.describe AfterCommitEverywhere do
           subject
         end
         expect(handler).not_to have_received(:call)
+      end
+
+      it "preserves the locale" do
+        I18n.enforce_available_locales = false
+
+        ActiveRecord::Base.transaction do
+          expect(I18n.locale).not_to eq(:de)
+          I18n.with_locale(:de) { example_class.new.after_rollback { handler.call(I18n.locale) } }
+          expect(handler).not_to have_received(:call)
+          raise ActiveRecord::Rollback
+        end
+        expect(handler).to have_received(:call).with(:de)
+
+        I18n.enforce_available_locales = true
       end
     end
 
